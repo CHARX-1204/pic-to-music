@@ -1,0 +1,136 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000001 /* MemoryVinylApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000001 /* MemoryVinylApp.swift */; };
+		A00000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000002 /* ContentView.swift */; };
+		A00000000000000000000003 /* AppFlowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000003 /* AppFlowViewModel.swift */; };
+		A00000000000000000000004 /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000004 /* Song.swift */; };
+		A00000000000000000000005 /* EmotionProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000005 /* EmotionProfile.swift */; };
+		A00000000000000000000006 /* EmotionAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000006 /* EmotionAnalyzer.swift */; };
+		A00000000000000000000007 /* LyricImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000007 /* LyricImageRenderer.swift */; };
+		A00000000000000000000008 /* ReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000008 /* ReadingView.swift */; };
+		A00000000000000000000009 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000009 /* HomeView.swift */; };
+		A0000000000000000000000A /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000A /* ResultView.swift */; };
+		A0000000000000000000000B /* RecommendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000B /* RecommendView.swift */; };
+		A0000000000000000000000C /* TurntableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000C /* TurntableView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B00000000000000000000001 /* MemoryVinylApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/MemoryVinylApp.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/ContentView.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000003 /* AppFlowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Core/ViewModel/AppFlowViewModel.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000004 /* Song.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Core/Models/Song.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000005 /* EmotionProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Core/Models/EmotionProfile.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000006 /* EmotionAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Core/Services/EmotionAnalyzer.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000007 /* LyricImageRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Core/Services/LyricImageRenderer.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000008 /* ReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Features/Reading/ReadingView.swift; sourceTree = SOURCE_ROOT; };
+		B00000000000000000000009 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Features/Home/HomeView.swift; sourceTree = SOURCE_ROOT; };
+		B0000000000000000000000A /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Features/Result/ResultView.swift; sourceTree = SOURCE_ROOT; };
+		B0000000000000000000000B /* RecommendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Features/Recommend/RecommendView.swift; sourceTree = SOURCE_ROOT; };
+		B0000000000000000000000C /* TurntableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryVinyl/Features/Components/TurntableView.swift; sourceTree = SOURCE_ROOT; };
+		B0000000000000000000000D /* MemoryVinyl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MemoryVinyl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C00000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D00000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000001 /* MemoryVinylApp.swift */,
+				B00000000000000000000002 /* ContentView.swift */,
+				B00000000000000000000003 /* AppFlowViewModel.swift */,
+				B00000000000000000000004 /* Song.swift */,
+				B00000000000000000000005 /* EmotionProfile.swift */,
+				B00000000000000000000006 /* EmotionAnalyzer.swift */,
+				B00000000000000000000007 /* LyricImageRenderer.swift */,
+				B00000000000000000000008 /* ReadingView.swift */,
+				B00000000000000000000009 /* HomeView.swift */,
+				B0000000000000000000000A /* ResultView.swift */,
+				B0000000000000000000000B /* RecommendView.swift */,
+				B0000000000000000000000C /* TurntableView.swift */,
+				D00000000000000000000002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D00000000000000000000002 /* Products */ = {isa = PBXGroup; children = (B0000000000000000000000D /* MemoryVinyl.app */,); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E00000000000000000000001 /* MemoryVinyl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F00000000000000000000002 /* Build configuration list for PBXNativeTarget "MemoryVinyl" */;
+			buildPhases = (C00000000000000000000003 /* Sources */, C00000000000000000000001 /* Frameworks */, C00000000000000000000002 /* Resources */);
+			buildRules = ();
+			dependencies = ();
+			name = MemoryVinyl;
+			productName = MemoryVinyl;
+			productReference = B0000000000000000000000D /* MemoryVinyl.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E00000000000000000000002 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 2630; LastUpgradeCheck = 2630; TargetAttributes = {E00000000000000000000001 = {CreatedOnToolsVersion = 26.3; }; }; };
+			buildConfigurationList = F00000000000000000000001 /* Build configuration list for PBXProject "MemoryVinyl" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base);
+			mainGroup = D00000000000000000000001;
+			productRefGroup = D00000000000000000000002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (E00000000000000000000001 /* MemoryVinyl */);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C00000000000000000000002 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C00000000000000000000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000001 /* MemoryVinylApp.swift in Sources */,
+				A00000000000000000000002 /* ContentView.swift in Sources */,
+				A00000000000000000000003 /* AppFlowViewModel.swift in Sources */,
+				A00000000000000000000004 /* Song.swift in Sources */,
+				A00000000000000000000005 /* EmotionProfile.swift in Sources */,
+				A00000000000000000000006 /* EmotionAnalyzer.swift in Sources */,
+				A00000000000000000000007 /* LyricImageRenderer.swift in Sources */,
+				A00000000000000000000008 /* ReadingView.swift in Sources */,
+				A00000000000000000000009 /* HomeView.swift in Sources */,
+				A0000000000000000000000A /* ResultView.swift in Sources */,
+				A0000000000000000000000B /* RecommendView.swift in Sources */,
+				A0000000000000000000000C /* TurntableView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F00000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; COPY_PHASE_STRIP = NO; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_TESTABILITY = YES; GCC_C_LANGUAGE_STANDARD = gnu17; GCC_OPTIMIZATION_LEVEL = 0; ONLY_ACTIVE_ARCH = YES; SDKROOT = iphoneos; SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
+		F00000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; COPY_PHASE_STRIP = YES; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; GCC_C_LANGUAGE_STANDARD = gnu17; SDKROOT = iphoneos; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_OPTIMIZATION_LEVEL = "-O"; VALIDATE_PRODUCT = YES; }; name = Release; };
+		F00000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEVELOPMENT_TEAM = ""; ENABLE_PREVIEWS = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = MemoryVinyl; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music"; INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "选择照片以生成专属音乐记忆。"; INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES; INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES; INFOPLIST_KEY_UILaunchScreen_Generation = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = com.charx.MemoryVinyl; PRODUCT_NAME = "$(TARGET_NAME)"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Debug; };
+		F00000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEVELOPMENT_TEAM = ""; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = MemoryVinyl; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music"; INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "选择照片以生成专属音乐记忆。"; INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES; INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES; INFOPLIST_KEY_UILaunchScreen_Generation = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = com.charx.MemoryVinyl; PRODUCT_NAME = "$(TARGET_NAME)"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F00000000000000000000001 /* Build configuration list for PBXProject "MemoryVinyl" */ = {isa = XCConfigurationList; buildConfigurations = (F00000000000000000000003 /* Debug */, F00000000000000000000004 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		F00000000000000000000002 /* Build configuration list for PBXNativeTarget "MemoryVinyl" */ = {isa = XCConfigurationList; buildConfigurations = (F00000000000000000000005 /* Debug */, F00000000000000000000006 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = E00000000000000000000002 /* Project object */;
+}

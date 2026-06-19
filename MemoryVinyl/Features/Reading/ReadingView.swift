@@ -5,7 +5,7 @@ struct ReadingView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            TurntableView(
+            TurntableStage(
                 image: viewModel.selectedImage,
                 insertedProgress: viewModel.insertedProgress,
                 playing: true,
@@ -14,7 +14,9 @@ struct ReadingView: View {
             Text("请稍候，系统正在匹配音乐记忆...")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
+
+            Spacer(minLength: 0)
         }
-        .padding(20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
