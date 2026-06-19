@@ -1,0 +1,1027 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Memory Vinyl Demo</title>
+  <style>
+    :root {
+      --bg-top: #4f6878;
+      --bg-bottom: #19322f;
+      --panel: #ececef;
+      --panel-shadow: #b9bcc3;
+      --text: #f4f6fa;
+      --muted: #bac1cc;
+      --accent: #7fd1ff;
+      --accent-weak: rgba(127, 209, 255, 0.24);
+      --danger: #ff8f8f;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, #2d4a4d 42%, var(--bg-bottom) 100%);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .app {
+      width: min(100%, 420px);
+      min-height: 860px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
+      backdrop-filter: blur(2px);
+      box-shadow: 0 24px 44px rgba(0, 0, 0, 0.34);
+      padding: 22px 18px calc(env(safe-area-inset-bottom) + 24px);
+    }
+
+    .title {
+      text-align: center;
+      margin-top: 2px;
+      margin-bottom: 12px;
+      font-weight: 620;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      margin: 6px auto 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .view { display: none; animation: fade .25s ease; }
+    .view.active { display: block; }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .turntable-wrap { position: relative; width: 100%; max-width: 360px; margin: 0 auto 16px; padding-top: 78px; }
+
+    .photo-card {
+      width: 260px; height: 360px; border-radius: 10px 10px 4px 4px;
+      background: #f8fafc;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      overflow: hidden;
+      position: absolute;
+      left: 50%; top: 0;
+      transform: translate(-50%, 0);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+      transition: transform 2.25s cubic-bezier(.2,.8,.2,1), opacity .35s ease;
+    }
+
+    .photo-card.inserted { transform: translate(-50%, 48px); }
+    .photo-card.hidden { opacity: 0; transform: translate(-50%, -30px); }
+    .photo-card.reading-start { transform: translate(-50%, -440px); }
+    .photo-card.reading-inserted {
+      transform: translate(-50%, 86px);
+      transition: transform 3.6s cubic-bezier(.2,.72,.2,1), opacity .35s ease;
+    }
+
+    .photo-content {
+      width: calc(100% - 14px); height: calc(100% - 54px); margin: 7px auto 0;
+      border-radius: 6px; background: linear-gradient(180deg, #6d8594, #3f5564);
+      overflow: hidden;
+    }
+    .photo-content img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-meta {
+      height: 40px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px; color: #6a6f77; font-size: 12px; letter-spacing: .08em;
+    }
+
+    .turntable {
+      background: linear-gradient(145deg, #fbfbfc 0%, var(--panel) 58%, #d7d9df 100%);
+      border-radius: 24px;
+      border: 1px solid #d7d9de;
+      min-height: 350px;
+      position: relative;
+      box-shadow: 0 18px 24px rgba(0, 0, 0, 0.24), inset 0 2px 2px rgba(255, 255, 255, 0.88), inset 0 -2px 6px rgba(0, 0, 0, 0.08);
+      padding: 22px;
+    }
+    .turntable::before {
+      content: "";
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      top: -4px;
+      height: 14px;
+      border-radius: 0 0 10px 10px;
+      background: linear-gradient(180deg, rgba(115, 119, 128, 0.44), rgba(244, 245, 248, 0.0));
+      z-index: 8;
+      pointer-events: none;
+    }
+
+    .logo { position: absolute; left: 20px; top: 14px; color: #9ca2ac; font-size: 26px; font-weight: 700; }
+
+    .platter {
+      width: 100%; aspect-ratio: 1; max-width: 280px; border-radius: 50%;
+      background: radial-gradient(circle, #ebeef2 0%, #cfd3db 70%, #bdc1ca 100%);
+      margin: 24px auto 0; display: grid; place-items: center;
+      box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.82), inset 0 -4px 10px rgba(0, 0, 0, 0.11);
+    }
+
+    .vinyl {
+      width: 88%; aspect-ratio: 1; border-radius: 50%;
+      background: repeating-radial-gradient(circle, #12141b 0 2px, #0c0f14 2px 4px), radial-gradient(circle at 50% 38%, #181b22 0, #090b10 70%);
+      box-shadow: inset -12px -18px 24px rgba(0, 0, 0, 0.56), 0 8px 14px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    .vinyl::before { content: ""; position: absolute; inset: 34%; border-radius: 50%; background: #f3f4f6; }
+    .vinyl::after { content: ""; position: absolute; inset: 49%; border-radius: 50%; background: #a9adb5; box-shadow: 0 0 0 2px #eceef2; }
+
+    .tone-base {
+      position: absolute; right: 24px; top: 48px; width: 56px; height: 56px; border-radius: 50%;
+      background: radial-gradient(circle at 36% 30%, #fff, #a6abb4 48%, #5f6470);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.7), 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .tonearm {
+      position: absolute; right: 38px; top: 82px; width: 170px; height: 10px;
+      border-radius: 999px; transform-origin: 138px 5px;
+      transform: rotate(38deg);
+      background: linear-gradient(180deg, #fff, #c9ced6 56%, #b5bbc5);
+      transition: transform .38s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22);
+    }
+    .tonearm::before {
+      content: ""; position: absolute; left: -2px; top: -8px; width: 22px; height: 26px;
+      border-radius: 10px; background: linear-gradient(160deg, #f8f8f8, #bac0ca);
+    }
+    .needle {
+      position: absolute; right: -2px; top: -7px; width: 18px; height: 24px; border-radius: 4px 4px 6px 6px;
+      background: linear-gradient(180deg, #f7f8fa, #c6ccd6);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+    .needle::after {
+      content: ""; width: 2px; height: 12px; background: #7f8590;
+      position: absolute; right: 6px; top: 20px; transform: rotate(14deg); transform-origin: top;
+    }
+
+    .status-line {
+      margin-top: 14px;
+      text-align: center;
+      color: #5d646f;
+      font-size: 13px;
+      min-height: 20px;
+      letter-spacing: .03em;
+    }
+
+    .actions { margin-top: 14px; display: flex; gap: 10px; }
+    .btn {
+      border: 0; border-radius: 12px; padding: 12px 14px; font-size: 15px;
+      background: rgba(255, 255, 255, 0.16); color: #fff; cursor: pointer;
+      flex: 1;
+    }
+    .btn.primary { background: linear-gradient(180deg, #8ad6ff, #58b7ef); color: #0c2637; font-weight: 620; }
+    .btn.ghost { background: rgba(255, 255, 255, 0.12); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .panel {
+      margin-top: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.12);
+      padding: 12px;
+    }
+    .song-name { font-size: 24px; text-align: center; font-weight: 650; margin-top: 2px; }
+    .artist { color: var(--muted); text-align: center; margin-top: 5px; }
+    .tags { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .tag {
+      font-size: 12px; padding: 6px 9px; border-radius: 999px;
+      border: 1px solid var(--accent-weak); background: rgba(127, 209, 255, 0.1); color: #d6efff;
+    }
+
+    .reason {
+      margin-top: 12px;
+      line-height: 1.45;
+      color: #dae4ed;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .picked-preview {
+      margin-top: 12px;
+      display: grid;
+      gap: 7px;
+    }
+    .picked-line {
+      color: #eaf0fa;
+      font-size: 14px;
+      line-height: 1.35;
+      padding: 8px 10px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .pick-empty {
+      color: #aeb8c7;
+      font-size: 13px;
+      text-align: center;
+      padding: 12px 0;
+    }
+
+    .hint {
+      font-size: 12px;
+      margin-top: 6px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(env(safe-area-inset-bottom) + 16px);
+      background: rgba(0, 0, 0, 0.72);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .toast.show { opacity: 1; }
+
+    .result {
+      margin-top: 12px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(0, 0, 0, 0.2);
+      min-height: 340px;
+      display: grid;
+      place-items: center;
+    }
+    .result img { width: 100%; display: block; }
+
+    .song-switch {
+      margin-top: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .chip {
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #d7dfeb;
+      cursor: pointer;
+    }
+
+    .turntable.playing .vinyl { animation: spin 4.8s linear infinite; }
+    .turntable.playing .tonearm { transform: rotate(26deg); }
+
+    .lyric-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      flex-direction: column;
+      background: linear-gradient(180deg, rgba(56, 56, 56, 0.94), rgba(28, 28, 28, 0.96));
+      backdrop-filter: blur(3px);
+    }
+    .lyric-overlay.show { display: flex; }
+    .lyric-header {
+      padding: 18px 16px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 30px;
+      font-weight: 600;
+      letter-spacing: .04em;
+    }
+    .lyric-close {
+      position: absolute;
+      left: 16px;
+      top: 14px;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .lyric-scroll {
+      flex: 1;
+      overflow: auto;
+      padding: 6px 12px 98px;
+    }
+    .overlay-line {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.35);
+      padding: 9px 36px 9px 24px;
+      border-radius: 12px;
+      position: relative;
+      text-align: center;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: background .18s ease, color .18s ease, opacity .18s ease;
+      opacity: .58;
+    }
+    .overlay-line .line-main {
+      display: block;
+      font-size: 38px;
+      line-height: 1.15;
+      font-weight: 600;
+      letter-spacing: .01em;
+    }
+    .overlay-line .line-sub {
+      display: block;
+      margin-top: 4px;
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.4);
+      line-height: 1.2;
+    }
+    .overlay-line.selected {
+      color: rgba(255, 255, 255, 0.93);
+      opacity: .98;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .overlay-line.selected .line-sub { color: rgba(255, 255, 255, 0.74); }
+    .overlay-line.selected::before {
+      content: "✓";
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .lyric-toolbar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px 8px calc(env(safe-area-inset-bottom) + 10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(31, 31, 31, 0.92);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+    .lyric-tool {
+      border: 0;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 12px;
+      display: grid;
+      gap: 4px;
+      justify-items: center;
+      align-content: center;
+      padding: 6px 0;
+      cursor: pointer;
+    }
+    .lyric-tool .icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+    }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0, 0, 0, 0); white-space: nowrap;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1 class="title">Memory Vinyl</h1>
+    <p class="subtitle">把一张照片变成一首歌</p>
+
+    <input id="photoInput" class="sr-only" type="file" accept="image/png,image/jpeg,image/heic,image/heif" />
+
+    <section id="homeView" class="view active">
+      <div class="turntable-wrap">
+        <div class="photo-card hidden" id="photoCardHome">
+          <div class="photo-content" id="photoPreviewHome"></div>
+          <div class="photo-meta"><span>Memory 01</span><span id="dateHome"></span><span>●</span></div>
+        </div>
+        <div class="turntable" id="turntableHome">
+          <span class="logo">Q</span>
+          <div class="platter"><div class="vinyl"></div></div>
+          <div class="tone-base"></div>
+          <div class="tonearm"><div class="needle"></div></div>
+          <p class="status-line">上传照片，唱片机会读取你的情绪记忆</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="selectBtn">选择照片</button>
+      </div>
+    </section>
+
+    <section id="readingView" class="view">
+      <div class="turntable-wrap">
+        <div class="photo-card reading-start" id="photoCardReading">
+          <div class="photo-content" id="photoPreviewReading"></div>
+          <div class="photo-meta"><span>Memory 01</span><span id="dateReading"></span><span>●</span></div>
+        </div>
+        <div class="turntable playing" id="turntableReading">
+          <span class="logo">Q</span>
+          <div class="platter"><div class="vinyl"></div></div>
+          <div class="tone-base"></div>
+          <div class="tonearm"><div class="needle"></div></div>
+          <p class="status-line" id="readingStatus">正在读取照片氛围</p>
+        </div>
+      </div>
+      <p class="hint">请稍候，系统正在匹配音乐记忆...</p>
+    </section>
+
+    <section id="recommendView" class="view">
+      <div class="turntable-wrap">
+        <div class="photo-card inserted" id="photoCardReco">
+          <div class="photo-content" id="photoPreviewReco"></div>
+          <div class="photo-meta"><span>Memory 01</span><span id="dateReco"></span><span>●</span></div>
+        </div>
+        <div class="turntable playing" id="turntableReco">
+          <span class="logo">Q</span>
+          <div class="platter"><div class="vinyl"></div></div>
+          <div class="tone-base"></div>
+          <div class="tonearm"><div class="needle"></div></div>
+          <p class="status-line" id="recoStatus">默认试听中...</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="song-name" id="songName"></h2>
+        <p class="artist" id="artist"></p>
+        <div class="tags" id="tags"></div>
+        <p class="reason" id="reason"></p>
+        <div class="song-switch">
+          <span class="chip" id="prevSong">上一首</span>
+          <span id="songIndex">1 / 3</span>
+          <span class="chip" id="nextSong">下一首</span>
+        </div>
+        <div class="picked-preview" id="pickedPreview"></div>
+        <p class="hint" id="lyricHint">请选择 1-3 段歌词</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost" id="pickLyricsBtn">选择歌词</button>
+        <button class="btn primary" id="generateBtn" disabled>生成歌词图</button>
+      </div>
+    </section>
+
+    <section id="resultView" class="view">
+      <div class="panel">
+        <h2 class="song-name" id="resultSong"></h2>
+        <p class="artist" id="resultArtist"></p>
+      </div>
+      <div class="result">
+        <img id="resultImage" alt="生成结果图" />
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="saveBtn">保存图片</button>
+        <button class="btn ghost" id="shareBtn">分享</button>
+      </div>
+      <div class="actions">
+        <button class="btn ghost" id="regenBtn">重新生成</button>
+      </div>
+    </section>
+
+    <div class="toast" id="toast"></div>
+
+    <section class="lyric-overlay" id="lyricOverlay">
+      <header class="lyric-header">
+        <button class="lyric-close" id="closeLyricOverlay">×</button>
+        选择歌词
+      </header>
+      <div class="lyric-scroll" id="lyricOverlayList"></div>
+      <footer class="lyric-toolbar">
+        <button class="lyric-tool" id="toolExtract"><span class="icon">✎</span><span>摘录歌词</span></button>
+        <button class="lyric-tool" id="toolCopy"><span class="icon">⧉</span><span>复制歌词</span></button>
+        <button class="lyric-tool" id="toolImageShare"><span class="icon">▣</span><span>图片分享</span></button>
+        <button class="lyric-tool" id="toolVideoShare"><span class="icon">▶</span><span>视频分享</span></button>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      view: "home",
+      imageUrl: "",
+      imageBitmap: null,
+      selectedLyrics: [],
+      songs: [],
+      currentSongIndex: 0,
+      detected: null,
+      generatedUrl: ""
+    };
+
+    const READING_TEXTS = [
+      "正在读取照片氛围",
+      "正在识别画面情绪",
+      "正在匹配音乐记忆"
+    ];
+
+    const SONG_LIBRARY = {
+      "蓝色夜晚": [
+        {
+          songName: "因为爱情",
+          artist: "陈奕迅 / 王菲",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["虽然会经常忘了", "我依然爱着你", "因为爱情", "不会轻易悲伤", "所以一切都是幸福的模样"],
+          emotionTags: ["安静", "怀旧", "浪漫"],
+          reason: "这张照片里的冷色氛围与孤独灯光，适合温柔但有记忆感的对唱。"
+        },
+        {
+          songName: "富士山下",
+          artist: "陈奕迅",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["谁都只得那双手", "靠拥抱亦难任你拥有", "要拥有必先懂失去怎接受", "你还嫌不够", "我把这陈年风褛送赠你解咒"],
+          emotionTags: ["克制", "夜色", "情绪流动"],
+          reason: "构图有明显透视线，情绪向内收，适合叙事型慢歌。"
+        },
+        {
+          songName: "后来",
+          artist: "刘若英",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["后来 我总算学会了如何去爱", "可惜你早已远去", "消失在人海", "后来 终于在眼泪中明白", "有些人 一旦错过就不在"],
+          emotionTags: ["遗憾", "回望", "抒情"],
+          reason: "画面有回忆胶片感，适合带一点遗憾的经典旋律。"
+        }
+      ],
+      "海边日落": [
+        {
+          songName: "海阔天空",
+          artist: "Beyond",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["原谅我这一生不羁放纵爱自由", "也会怕有一天会跌倒", "背弃了理想 谁人都可以", "哪会怕有一天只你共我"],
+          emotionTags: ["自由", "海边", "热烈"],
+          reason: "海景与开阔地平线让情绪更外放，适合有力量的主歌。"
+        },
+        {
+          songName: "晴天",
+          artist: "周杰伦",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["故事的小黄花", "从出生那年就飘着", "童年的荡秋千", "随记忆一直晃到现在", "从前从前有个人爱你很久"],
+          emotionTags: ["青春", "暖色", "轻快"],
+          reason: "夕阳带来的暖色调，容易触发青春叙事。"
+        },
+        {
+          songName: "小幸运",
+          artist: "田馥甄",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["与你相遇 好幸运", "可我已失去为你泪流满面的权利", "但愿在我看不到的天际", "你张开了双翼", "遇见你的注定"],
+          emotionTags: ["温柔", "治愈", "轻怀旧"],
+          reason: "天空和人物的距离感适合细腻又亮一点的旋律。"
+        }
+      ],
+      "城市孤独": [
+        {
+          songName: "夜空中最亮的星",
+          artist: "逃跑计划",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["夜空中最亮的星", "请照亮我前行", "我祈祷拥有一颗透明的心灵", "和会流泪的眼睛"],
+          emotionTags: ["城市", "夜晚", "希望"],
+          reason: "孤独并不消极，灯光与空间让希望更清晰。"
+        },
+        {
+          songName: "慢慢喜欢你",
+          artist: "莫文蔚",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["书里总爱写到喜出望外的傍晚", "骑的单车还有他和他的衬衫", "我想我会开始想念你", "可是我刚刚才遇见了你"],
+          emotionTags: ["慢节奏", "柔软", "浪漫"],
+          reason: "都市背景与人物比例强化了“慢慢靠近”的情绪。"
+        },
+        {
+          songName: "成都",
+          artist: "赵雷",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["和我在成都的街头走一走", "直到所有的灯都熄灭了也不停留", "你会挽着我的衣袖", "我会把手揣进裤兜"],
+          emotionTags: ["城市街景", "松弛", "生活感"],
+          reason: "街道、灯光、人群边缘感，适合叙述式民谣。"
+        }
+      ],
+      "暖色黄昏": [
+        {
+          songName: "小半",
+          artist: "陈粒",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["我的爱意有些任性", "不愿意放手", "你是我穷极一生都做不完的梦", "我在等 风也在等"],
+          emotionTags: ["黄昏", "柔和", "情绪化"],
+          reason: "暖色偏低饱和，适合细碎而克制的歌词。"
+        },
+        {
+          songName: "稻香",
+          artist: "周杰伦",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["还记得你说家是唯一的城堡", "随着稻香河流继续奔跑", "不要哭让萤火虫带着你逃跑", "乡间的歌谣永远的依靠"],
+          emotionTags: ["治愈", "轻松", "回忆"],
+          reason: "画面有放松感，歌曲可拉高幸福感。"
+        },
+        {
+          songName: "平凡之路",
+          artist: "朴树",
+          coverImage: "",
+          audioPreview: "",
+          lyricLines: ["我曾经跨过山和大海", "也穿过人山人海", "我曾经拥有着一切", "转眼都飘散如烟", "我曾经失落失望失掉所有方向"],
+          emotionTags: ["旅途", "成长", "自由"],
+          reason: "黄昏通常意味着一天结束，也适合旅途感表达。"
+        }
+      ]
+    };
+
+    const views = {
+      home: document.getElementById("homeView"),
+      reading: document.getElementById("readingView"),
+      recommend: document.getElementById("recommendView"),
+      result: document.getElementById("resultView")
+    };
+
+    const photoInput = document.getElementById("photoInput");
+    const selectBtn = document.getElementById("selectBtn");
+    const readingStatus = document.getElementById("readingStatus");
+    const generateBtn = document.getElementById("generateBtn");
+    const pickedPreview = document.getElementById("pickedPreview");
+    const lyricHint = document.getElementById("lyricHint");
+    const resultImage = document.getElementById("resultImage");
+    const toastEl = document.getElementById("toast");
+    const lyricOverlay = document.getElementById("lyricOverlay");
+    const lyricOverlayList = document.getElementById("lyricOverlayList");
+
+    const dateText = new Date().toLocaleDateString("zh-CN").replaceAll("/", " / ");
+    document.getElementById("dateHome").textContent = dateText;
+    document.getElementById("dateReading").textContent = dateText;
+    document.getElementById("dateReco").textContent = dateText;
+
+    selectBtn.addEventListener("click", () => photoInput.click());
+
+    photoInput.addEventListener("change", async (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) {
+        showToast("未选择图片，请重试");
+        return;
+      }
+      if (!/^image\//.test(file.type)) {
+        showToast("图片格式暂不支持");
+        return;
+      }
+      try {
+        await loadImage(file);
+        bindPhotoToCards();
+        startReadingFlow();
+      } catch (err) {
+        console.error(err);
+        showToast("图片读取失败，请重新选择");
+      }
+    });
+
+    document.getElementById("prevSong").addEventListener("click", () => switchSong(-1));
+    document.getElementById("nextSong").addEventListener("click", () => switchSong(1));
+    document.getElementById("pickLyricsBtn").addEventListener("click", () => toggleLyricOverlay(true));
+    document.getElementById("closeLyricOverlay").addEventListener("click", () => toggleLyricOverlay(false));
+    generateBtn.addEventListener("click", async () => {
+      if (!state.selectedLyrics.length) return;
+      await generateResultImage();
+      setView("result");
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      if (!state.generatedUrl) return;
+      const a = document.createElement("a");
+      a.href = state.generatedUrl;
+      a.download = `memory-vinyl-${Date.now()}.png`;
+      a.click();
+      showToast("已触发保存，请在相册中查看");
+    });
+
+    document.getElementById("shareBtn").addEventListener("click", async () => {
+      const currentSong = state.songs[state.currentSongIndex];
+      const shareText = `${currentSong.songName} - ${currentSong.artist}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Memory Vinyl", text: shareText, url: state.generatedUrl });
+        } catch (_) {}
+      } else {
+        await navigator.clipboard.writeText(shareText);
+        showToast("已复制歌曲信息，可手动分享图片");
+      }
+    });
+
+    document.getElementById("regenBtn").addEventListener("click", () => {
+      state.selectedLyrics = [];
+      renderLyrics();
+      setView("recommend");
+    });
+    document.getElementById("toolExtract").addEventListener("click", () => showToast("已摘录选中歌词"));
+    document.getElementById("toolCopy").addEventListener("click", copySelectedLyrics);
+    document.getElementById("toolImageShare").addEventListener("click", async () => {
+      if (!state.generatedUrl) await generateResultImage();
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Memory Vinyl 歌词图", text: "我生成了一张歌词图", url: state.generatedUrl });
+        } catch (_) {}
+      } else {
+        showToast("请先点击生成，再使用系统分享");
+      }
+    });
+    document.getElementById("toolVideoShare").addEventListener("click", () => showToast("视频分享为演示占位能力"));
+
+    bindSwipe();
+
+    function setView(viewName) {
+      state.view = viewName;
+      Object.entries(views).forEach(([key, el]) => {
+        el.classList.toggle("active", key === viewName);
+      });
+    }
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toastEl.classList.remove("show"), 1800);
+    }
+
+    async function loadImage(file) {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      image.src = url;
+      await image.decode();
+      state.imageUrl = url;
+      state.imageBitmap = image;
+    }
+
+    function bindPhotoToCards() {
+      const markup = `<img src="${state.imageUrl}" alt="用户照片"/>`;
+      document.getElementById("photoPreviewHome").innerHTML = markup;
+      document.getElementById("photoPreviewReading").innerHTML = markup;
+      document.getElementById("photoPreviewReco").innerHTML = markup;
+      document.getElementById("photoCardHome").classList.remove("hidden");
+    }
+
+    async function startReadingFlow() {
+      setView("reading");
+      const card = document.getElementById("photoCardReading");
+      card.classList.remove("inserted", "reading-inserted");
+      card.classList.add("reading-start");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          card.classList.add("reading-inserted");
+        });
+      });
+      runInsertHaptics();
+
+      let i = 0;
+      readingStatus.textContent = READING_TEXTS[0];
+      const timer = window.setInterval(() => {
+        i = (i + 1) % READING_TEXTS.length;
+        readingStatus.textContent = READING_TEXTS[i];
+      }, 1100);
+
+      await wait(4300);
+      window.clearInterval(timer);
+      state.detected = detectEmotion(state.imageBitmap);
+      state.songs = SONG_LIBRARY[state.detected.category];
+      state.currentSongIndex = 0;
+      state.selectedLyrics = [];
+      renderCurrentSong();
+      setView("recommend");
+    }
+
+    function detectEmotion(image) {
+      const canvas = document.createElement("canvas");
+      const sampleW = 80;
+      const sampleH = Math.max(80, Math.floor((image.naturalHeight / image.naturalWidth) * 80));
+      canvas.width = sampleW;
+      canvas.height = sampleH;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(image, 0, 0, sampleW, sampleH);
+      const { data } = ctx.getImageData(0, 0, sampleW, sampleH);
+
+      let total = 0;
+      let cool = 0;
+      let warm = 0;
+      for (let p = 0; p < data.length; p += 4) {
+        const r = data[p];
+        const g = data[p + 1];
+        const b = data[p + 2];
+        total += (r + g + b) / 3;
+        if (b > r + 10) cool += 1;
+        if (r > b + 16) warm += 1;
+      }
+
+      const pixelCount = data.length / 4;
+      const avg = total / pixelCount;
+      const coolRatio = cool / pixelCount;
+      const warmRatio = warm / pixelCount;
+
+      if (warmRatio > 0.38) return { category: "暖色黄昏", mainEmotion: "治愈", tags: ["暖色", "黄昏", "温柔"] };
+      if (coolRatio > 0.42 && avg < 110) return { category: "蓝色夜晚", mainEmotion: "安静", tags: ["蓝色", "夜晚", "怀旧"] };
+      if (avg > 148) return { category: "海边日落", mainEmotion: "自由", tags: ["开阔", "风景", "浪漫"] };
+      return { category: "城市孤独", mainEmotion: "孤独", tags: ["城市", "低饱和", "安静"] };
+    }
+
+    function renderCurrentSong() {
+      const song = state.songs[state.currentSongIndex];
+      document.getElementById("songName").textContent = song.songName;
+      document.getElementById("artist").textContent = song.artist;
+      document.getElementById("reason").textContent = song.reason;
+      document.getElementById("songIndex").textContent = `${state.currentSongIndex + 1} / ${state.songs.length}`;
+      document.getElementById("recoStatus").textContent = `主情绪：${state.detected.mainEmotion} · 默认试听中`;
+
+      const tags = [...state.detected.tags, ...song.emotionTags].slice(0, 6);
+      document.getElementById("tags").innerHTML = tags.map((tag) => `<span class="tag">${tag}</span>`).join("");
+      renderLyrics();
+    }
+
+    function renderLyrics() {
+      const song = state.songs[state.currentSongIndex];
+      lyricOverlayList.innerHTML = song.lyricLines.map((line) => {
+        const selected = state.selectedLyrics.includes(line);
+        return `<button class="overlay-line ${selected ? "selected" : ""}" data-line="${escapeHtml(line)}"><span class="line-main">${line}</span><span class="line-sub">${getLineSubText(line)}</span></button>`;
+      }).join("");
+
+      document.querySelectorAll(".overlay-line").forEach((el) => {
+        el.addEventListener("click", () => toggleLyric(el.dataset.line));
+      });
+
+      if (!state.selectedLyrics.length) {
+        pickedPreview.innerHTML = `<p class="pick-empty">尚未选择歌词，点击“选择歌词”开始</p>`;
+      } else {
+        pickedPreview.innerHTML = state.selectedLyrics.map((line) => `<p class="picked-line">${line}</p>`).join("");
+      }
+      generateBtn.disabled = state.selectedLyrics.length === 0;
+      lyricHint.textContent = `已选择 ${state.selectedLyrics.length} / 3 段歌词`;
+    }
+
+    function toggleLyric(line) {
+      const idx = state.selectedLyrics.indexOf(line);
+      if (idx >= 0) {
+        state.selectedLyrics.splice(idx, 1);
+        renderLyrics();
+        return;
+      }
+      if (state.selectedLyrics.length >= 3) {
+        showToast("最多选择 3 段歌词");
+        return;
+      }
+      state.selectedLyrics.push(line);
+      renderLyrics();
+    }
+
+    function switchSong(offset) {
+      if (!state.songs.length) return;
+      state.currentSongIndex = (state.currentSongIndex + offset + state.songs.length) % state.songs.length;
+      state.selectedLyrics = [];
+      renderCurrentSong();
+    }
+
+    function toggleLyricOverlay(open) {
+      lyricOverlay.classList.toggle("show", open);
+    }
+
+    function runInsertHaptics() {
+      if (!navigator.vibrate) return;
+      navigator.vibrate(25);
+      window.setTimeout(() => navigator.vibrate(35), 900);
+      window.setTimeout(() => navigator.vibrate([40, 80, 45]), 2150);
+    }
+
+    function getLineSubText(line) {
+      return `情绪释义：${line}`;
+    }
+
+    async function copySelectedLyrics() {
+      const text = state.selectedLyrics.join("\n");
+      if (!text) {
+        showToast("请先选择歌词");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("已复制选中歌词");
+      } catch (_) {
+        showToast("复制失败，请手动重试");
+      }
+    }
+
+    function bindSwipe() {
+      const recommendView = document.getElementById("recommendView");
+      let startX = 0;
+      recommendView.addEventListener("touchstart", (e) => {
+        startX = e.changedTouches[0].clientX;
+      });
+      recommendView.addEventListener("touchend", (e) => {
+        const delta = e.changedTouches[0].clientX - startX;
+        if (Math.abs(delta) < 46) return;
+        if (delta > 0) switchSong(-1);
+        else switchSong(1);
+      });
+    }
+
+    async function generateResultImage() {
+      const song = state.songs[state.currentSongIndex];
+      const img = state.imageBitmap;
+      const canvas = document.createElement("canvas");
+      const maxW = 1080;
+      const scale = maxW / img.naturalWidth;
+      canvas.width = maxW;
+      canvas.height = Math.round(img.naturalHeight * scale);
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const lines = [...state.selectedLyrics, `${song.songName} · ${song.artist}`];
+      const layout = chooseLayoutZone(ctx, canvas.width, canvas.height);
+      const fontSize = Math.max(28, Math.round(canvas.width * 0.035));
+      const lineHeight = Math.round(fontSize * 1.5);
+      const totalHeight = lineHeight * lines.length;
+      const x = layout.x;
+      let y = layout.y - totalHeight;
+      if (y < 40) y = 56;
+
+      ctx.font = `${fontSize}px "PingFang SC","Microsoft YaHei",sans-serif`;
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.textBaseline = "top";
+      ctx.shadowColor = "rgba(0,0,0,0.45)";
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetY = 2;
+
+      lines.forEach((line, i) => {
+        ctx.fillText(line, x, y + i * lineHeight);
+      });
+
+      state.generatedUrl = canvas.toDataURL("image/png");
+      resultImage.src = state.generatedUrl;
+      document.getElementById("resultSong").textContent = song.songName;
+      document.getElementById("resultArtist").textContent = song.artist;
+    }
+
+    function chooseLayoutZone(ctx, width, height) {
+      const regions = [
+        { x: 56, y: height - 80, w: width * 0.58, h: height * 0.3 },
+        { x: width * 0.42, y: height - 80, w: width * 0.52, h: height * 0.3 },
+        { x: 56, y: height * 0.58, w: width * 0.52, h: height * 0.28 }
+      ];
+      let best = regions[0];
+      let bestScore = -Infinity;
+      regions.forEach((r) => {
+        const img = ctx.getImageData(Math.floor(r.x), Math.floor(r.y - r.h), Math.floor(r.w), Math.floor(r.h));
+        let sum = 0;
+        for (let i = 0; i < img.data.length; i += 4) {
+          sum += (img.data[i] + img.data[i + 1] + img.data[i + 2]) / 3;
+        }
+        const avg = sum / (img.data.length / 4);
+        const score = Math.abs(avg - 128);
+        if (score > bestScore) {
+          bestScore = score;
+          best = r;
+        }
+      });
+      return best;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+  </script>
+</body>
+</html>
